@@ -1,5 +1,5 @@
 import { Manifest } from "deno-slack-sdk/mod.ts";
-import SampleWorkflow from "./workflows/sample_workflow.ts";
+import ChallengeInviteWorkflow from "./workflows/ChallengeInvite.workflow.ts";
 import SampleObjectDatastore from "./datastores/sample_datastore.ts";
 
 /**
@@ -11,7 +11,7 @@ export default Manifest({
   name: "HR Bot",
   description: "Bot for helping HR",
   icon: "assets/icon.png",
-  workflows: [SampleWorkflow],
+  workflows: [ChallengeInviteWorkflow],
   outgoingDomains: ["api.github.com"],
   datastores: [SampleObjectDatastore],
   botScopes: [
