@@ -1,7 +1,7 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 
 export const GitHubInvite = DefineFunction({
-  callback_id: "github_invite.function",
+  callback_id: "github_invite_function",
   title: "Create repo and invite candidate ",
   description:
     "Checks if the GitHub user exists, creates the repo from a template, and invites it as a collaborator.",
