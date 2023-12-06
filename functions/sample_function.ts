@@ -1,5 +1,4 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
-import SampleObjectDatastore from "../datastores/sample_datastore.ts";
 
 /**
  * Functions are reusable building blocks of automation that accept
@@ -14,25 +13,21 @@ export const SampleFunctionDefinition = DefineFunction({
   source_file: "functions/sample_function.ts",
   input_parameters: {
     properties: {
-      message: {
+      candidateGhUsername: {
         type: Schema.types.string,
-        description: "Message to be posted",
-      },
-      user: {
-        type: Schema.slack.types.user_id,
-        description: "The user invoking the workflow",
+        description: "The candidate's GitHub username",
       },
     },
-    required: ["message"],
+    required: ["candidateGhUsername"],
   },
   output_parameters: {
     properties: {
-      updatedMsg: {
+      responseMessage: {
         type: Schema.types.string,
-        description: "Updated message to be posted",
+        description: "Code challenge invitation URL",
       },
     },
-    required: ["updatedMsg"],
+    required: ["responseMessage"],
   },
 });
 
@@ -44,35 +39,85 @@ export const SampleFunctionDefinition = DefineFunction({
  */
 export default SlackFunction(
   SampleFunctionDefinition,
-  async ({ inputs, client }) => {
-    const uuid = crypto.randomUUID();
+  async ({ inputs, env }) => {
+    const username = inputs.candidateGhUsername;
 
-    // inputs.user is set from the interactivity_context defined in sample_trigger.ts
-    // https://api.slack.com/automation/forms#add-interactivity
-    const updatedMsg = `:wave: ` + `<@${inputs.user}>` +
-      ` submitted the following message: \n\n>${inputs.message}`;
-
-    const sampleObject = {
-      original_msg: inputs.message,
-      updated_msg: updatedMsg,
-      object_id: uuid,
+    const apiURL = "api.github.com";
+    const headers = {
+      Accept: "application/vnd.github+json",
+      Authorization: "Bearer " + env.GITHUB_TOKEN,
+      "Content-Type": "application/json",
     };
 
-    // Save the sample object to the datastore
-    // https://api.slack.com/automation/datastores
-    const putResponse = await client.apps.datastore.put<
-      typeof SampleObjectDatastore.definition
-    >({
-      datastore: "SampleObjects",
-      item: sampleObject,
-    });
+    try {
+      // test user
+      await fetch(`https://${apiURL}/users/${username}`, {
+        method: "GET",
+        headers,
+      }).then(async (res: Response) => {
+        if (res.status !== 200) {
+          throw new Error("Could not find user.");
+        }
 
-    if (!putResponse.ok) {
+        if ((await res.json())?.type !== "User") {
+          throw new Error(`"${username}" is not a user.`);
+        }
+      });
+
+      // create repo from template
+      const newRepoRes = await fetch(
+        `https://${apiURL}/repos/${env.CHALLENGE_ORG}/${env.TEMPLATE_REPO}/generate`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            owner: env.CHALLENGE_ORG,
+            name: username + env.NEW_REPO_SUFFIX,
+            private: true,
+          }),
+        },
+      ).then(async (res: Response) => {
+        if (res.status === 422) {
+          throw new Error(
+            "Failed to create the repo. Check that it's not there already.",
+          );
+        }
+        if (res.status !== 201) {
+          throw new Error("Failed to create the repo.");
+        }
+        return (await res.json());
+      });
+
+      // invite as collaborator
+      const collaboratorRes = await fetch(
+        `https://${apiURL}/repos/${newRepoRes?.full_name}/collaborators/${username}`,
+        {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({ permission: "maintain" }),
+        },
+      ).then(async (res: Response) => {
+        if (res.status === 204) {
+          console.warn(
+            `An existing collaborator or organization member was invited`,
+          );
+        }
+
+        if (res.status !== 201) {
+          throw new Error(`Failed to invite ${username} as collaborator.`);
+        }
+        return (await res.json());
+      });
+
+      const responseMessage = `Candidate ${username} was invited! ` +
+        `He/she has received an email with the link: ${collaboratorRes.html_url}.`;
+
+      return { outputs: { responseMessage: responseMessage } };
+    } catch (err) {
+      console.error(err);
       return {
-        error: `Failed to put item into the datastore: ${putResponse.error}`,
+        error: `An error was encountered: \`${err.message}\``,
       };
     }
-
-    return { outputs: { updatedMsg } };
   },
 );

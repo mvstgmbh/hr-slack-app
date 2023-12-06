@@ -47,12 +47,12 @@ const inputForm = SampleWorkflow.addStep(
         type: Schema.slack.types.channel_id,
         default: SampleWorkflow.inputs.channel,
       }, {
-        name: "message",
-        title: "Message",
+        name: "ghUsername",
+        title: "Candidate's GitHub username",
         type: Schema.types.string,
-        long: true,
+        long: false,
       }],
-      required: ["channel", "message"],
+      required: ["channel", "ghUsername"],
     },
   },
 );
@@ -65,8 +65,7 @@ const inputForm = SampleWorkflow.addStep(
  * https://api.slack.com/automation/functions/custom
  */
 const sampleFunctionStep = SampleWorkflow.addStep(SampleFunctionDefinition, {
-  message: inputForm.outputs.fields.message,
-  user: SampleWorkflow.inputs.user,
+  candidateGhUsername: inputForm.outputs.fields.ghUsername,
 });
 
 /**
@@ -75,9 +74,11 @@ const sampleFunctionStep = SampleWorkflow.addStep(SampleFunctionDefinition, {
  * a message and can be used alongside custom functions in a workflow.
  * https://api.slack.com/automation/functions
  */
-SampleWorkflow.addStep(Schema.slack.functions.SendMessage, {
+
+SampleWorkflow.addStep(Schema.slack.functions.SendEphemeralMessage, {
   channel_id: inputForm.outputs.fields.channel,
-  message: sampleFunctionStep.outputs.updatedMsg,
+  user_id: SampleWorkflow.inputs.user,
+  message: sampleFunctionStep.outputs.responseMessage,
 });
 
 export default SampleWorkflow;

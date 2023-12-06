@@ -9,8 +9,8 @@ import SampleWorkflow from "../workflows/sample_workflow.ts";
  */
 const sampleTrigger: Trigger<typeof SampleWorkflow.definition> = {
   type: TriggerTypes.Shortcut,
-  name: "Sample trigger",
-  description: "A sample trigger",
+  name: "Challenge the candidate!",
+  description: "Create a repo and invite the candidate to it!",
   workflow: `#/workflows/${SampleWorkflow.definition.callback_id}`,
   inputs: {
     interactivity: {
