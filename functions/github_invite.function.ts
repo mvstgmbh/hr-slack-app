@@ -30,6 +30,7 @@ export default SlackFunction(
   GitHubInvite,
   async ({ inputs, env }) => {
     const username = inputs.candidateGhUsername;
+    const newRepoName = username + env.NEW_REPO_SUFFIX;
 
     const apiURL = "api.github.com";
     const headers = {
@@ -40,18 +41,18 @@ export default SlackFunction(
 
     try {
       // Check if user exists
-      await fetch(`https://${apiURL}/users/${username}`, {
+      const user = await fetch(`https://${apiURL}/users/${username}`, {
         method: "GET",
         headers,
       }).then(async (res: Response) => {
         if (res.status !== 200) {
-          return { outputs: { responseMessage: "Could not find user" } };
+          console.error(res);
+          throw new Error("Could not find user");
         }
 
         if ((await res.json())?.type !== "User") {
-          return {
-            outputs: { responseMessage: `"${username}" is not a user.` },
-          };
+          console.error(res);
+          throw new Error(`"${username}" is not a user.`);
         }
       });
 
@@ -63,64 +64,60 @@ export default SlackFunction(
           headers,
           body: JSON.stringify({
             owner: env.CHALLENGE_ORG,
-            name: username + env.NEW_REPO_SUFFIX,
+            name: newRepoName,
             private: true,
           }),
         },
       ).then(async (res: Response) => {
         if (res.status === 422) {
-          return {
-            outputs: {
-              responseMessage:
-                "Failed to create the repo. Check that it's not there already.",
-            },
-          };
+          console.error(res);
+          throw new Error(
+            `Failed to create the repo. Check that "${env.CHALLENGE_ORG}/${newRepoName}" doesn't exist already.`,
+          );
         }
         if (res.status !== 201) {
-          return {
-            outputs: { responseMessage: "Failed to create the repo." },
-          };
+          console.error(res);
+          throw new Error("Failed to create the repo.");
         }
         return (await res.json());
       });
 
       // Invite as collaborator
-      const collaboratorRes = await fetch(
+      await fetch(
         `https://${apiURL}/repos/${newRepoRes?.full_name}/collaborators/${username}`,
         {
           method: "PUT",
           headers,
           body: JSON.stringify({ permission: "maintain" }),
         },
-      ).then(async (res: Response) => {
+      ).then((res: Response) => {
         if (res.status === 204) {
-          return {
-            outputs: {
-              responseMessage:
-                "An existing collaborator or organization member was invited. Was that intended?",
-            },
-          };
+          console.warn(
+            "An existing collaborator or organization member was invited",
+          );
         }
 
-        if (res.status !== 201) {
-          return {
-            outputs: {
-              responseMessage: `Failed to invite ${username} as collaborator.`,
-            },
-          };
+        if (res.status !== 204 && res.status !== 201) {
+          // TODO: Delete repo
+          console.error(res);
+          throw new Error(`Failed to invite ${username} as collaborator.`);
         }
-        return (await res.json());
       });
 
       // Build response message
-      const responseMessage = `Success! Candidate ${username} was invited. ` +
-        `He/she has received an email with the link: ${collaboratorRes.html_url}.`;
+      // TODO: Change response to richtext
+      // TODO: Add link to user.html_url
+      const responseMessage =
+        `🎉 Success! Candidate ${username} was invited. ` +
+        `He/she has received an email with the link: https://github.com/${newRepoRes?.full_name}/invitations`;
 
       return { outputs: { responseMessage: responseMessage } };
     } catch (err) {
       console.error(err);
       return {
-        error: `An error was encountered: \`${err.message}\``,
+        outputs: {
+          responseMessage: `⚠️ Ooops! ${err.message}`,
+        },
       };
     }
   },
