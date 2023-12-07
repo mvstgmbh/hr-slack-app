@@ -24,13 +24,14 @@ const ChallengeInviteWorkflow = DefineWorkflow({
 const inputForm = ChallengeInviteWorkflow.addStep(
   Schema.slack.functions.OpenForm,
   {
-    title: "Send message to channel",
+    title: "Invite a candidate",
+    description: "TODO", // TODO
     interactivity: ChallengeInviteWorkflow.inputs.interactivity,
-    submit_label: "Send message",
+    submit_label: "Send",
     fields: {
       elements: [{
         name: "ghUsername",
-        title: "Candidate's GitHub username",
+        title: "GitHub username",
         type: Schema.types.string,
         long: false,
       }],
