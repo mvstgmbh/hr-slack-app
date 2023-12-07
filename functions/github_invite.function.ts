@@ -47,7 +47,7 @@ export default SlackFunction(
       }).then(async (res: Response) => {
         if (res.status !== 200) {
           console.error(res);
-          throw new Error("Could not find user");
+          throw new Error(`Could not find user: "${username}"`);
         }
 
         const body = await res.json();
@@ -76,12 +76,17 @@ export default SlackFunction(
         if (res.status === 422) {
           console.error(res);
           throw new Error(
-            `Failed to create the repo. Check that "${env.CHALLENGE_ORG}/${newRepoName}" doesn't exist already.`,
+            `Failed to create the repo ` +
+              `<https://github.com/${env.CHALLENGE_ORG}/${newRepoName}|${newRepoName}>.` +
+              ` Check that it doesn't exist already.`,
           );
         }
         if (res.status !== 201) {
           console.error(res);
-          throw new Error("Failed to create the repo.");
+          throw new Error(
+            `Failed to create the repo ` +
+              `<https://github.com/${env.CHALLENGE_ORG}/${newRepoName}|${newRepoName}>.`,
+          );
         }
         return (await res.json());
       });
