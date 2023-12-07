@@ -18,7 +18,7 @@ export const GitHubInvite = DefineFunction({
   output_parameters: {
     properties: {
       responseMessage: {
-        type: Schema.types.string,
+        type: Schema.slack.types.rich_text,
         description: "Code challenge invitation URL",
       },
     },
@@ -50,10 +50,14 @@ export default SlackFunction(
           throw new Error("Could not find user");
         }
 
-        if ((await res.json())?.type !== "User") {
+        const body = await res.json();
+
+        if (body?.type !== "User") {
           console.error(res);
           throw new Error(`"${username}" is not a user.`);
         }
+
+        return body;
       });
 
       // Create repo from template
@@ -105,11 +109,10 @@ export default SlackFunction(
       });
 
       // Build response message
-      // TODO: Change response to richtext
-      // TODO: Add link to user.html_url
       const responseMessage =
-        `🎉 Success! Candidate ${username} was invited. ` +
-        `He/she has received an email with the link: https://github.com/${newRepoRes?.full_name}/invitations`;
+        `🎉 Success! <${user.html_url}|${username}> was invited. ` +
+        `He/she has received an email with ` +
+        `<https://github.com/${newRepoRes?.full_name}/invitations|the invite link>.`;
 
       return { outputs: { responseMessage: responseMessage } };
     } catch (err) {
