@@ -29,17 +29,12 @@ const inputForm = ChallengeInviteWorkflow.addStep(
     submit_label: "Send message",
     fields: {
       elements: [{
-        name: "channel",
-        title: "Channel to send message to",
-        type: Schema.slack.types.channel_id,
-        default: ChallengeInviteWorkflow.inputs.channel,
-      }, {
         name: "ghUsername",
         title: "Candidate's GitHub username",
         type: Schema.types.string,
         long: false,
       }],
-      required: ["channel", "ghUsername"],
+      required: ["ghUsername"],
     },
   },
 );
@@ -49,7 +44,7 @@ const inviteStep = ChallengeInviteWorkflow.addStep(GitHubInvite, {
 });
 
 ChallengeInviteWorkflow.addStep(Schema.slack.functions.SendEphemeralMessage, {
-  channel_id: inputForm.outputs.fields.channel,
+  channel_id: ChallengeInviteWorkflow.inputs.channel,
   user_id: ChallengeInviteWorkflow.inputs.user,
   message: inviteStep.outputs.responseMessage,
 });
