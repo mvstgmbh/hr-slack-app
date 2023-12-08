@@ -19,7 +19,7 @@ export const GitHubInvite = DefineFunction({
     properties: {
       responseMessage: {
         type: Schema.slack.types.rich_text,
-        description: "Code challenge invitation URL",
+        description: "Code challenge invitation message response",
       },
     },
     required: ["responseMessage"],
