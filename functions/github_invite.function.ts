@@ -129,7 +129,7 @@ export default SlackFunction(
       console.error(err);
       return {
         outputs: {
-          responseMessage: `⚠️ Ooops! ${err.message}`,
+          responseMessage: `⚠️ Oops! ${err.message}`,
         },
       };
     }
