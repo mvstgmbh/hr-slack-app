@@ -99,7 +99,7 @@ export default SlackFunction(
           headers,
           body: JSON.stringify({ permission: "maintain" }),
         },
-      ).then((res: Response) => {
+      ).then(async (res: Response) => {
         if (res.status === 204) {
           console.warn(
             "An existing collaborator or organization member was invited",
@@ -107,9 +107,20 @@ export default SlackFunction(
         }
 
         if (res.status !== 204 && res.status !== 201) {
-          // TODO: Delete repo
           console.error(res);
-          throw new Error(`Failed to invite ${username} as collaborator.`);
+
+          // Delete the repo
+          await fetch(
+            `https://${apiURL}/repos/${newRepoRes?.full_name}`,
+            {
+              method: "DELETE",
+              headers,
+            },
+          );
+
+          throw new Error(
+            `Failed to invite ${username} as collaborator. Repo was deleted.`,
+          );
         }
       });
 
