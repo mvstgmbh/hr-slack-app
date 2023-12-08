@@ -100,12 +100,6 @@ export default SlackFunction(
           body: JSON.stringify({ permission: "maintain" }),
         },
       ).then(async (res: Response) => {
-        if (res.status === 204) {
-          console.warn(
-            "An existing collaborator or organization member was invited",
-          );
-        }
-
         if (res.status !== 204 && res.status !== 201) {
           console.error(res);
 
