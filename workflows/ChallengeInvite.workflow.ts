@@ -1,5 +1,6 @@
 import { DefineWorkflow, Schema } from "deno-slack-sdk/mod.ts";
 import { GitHubInvite } from "../functions/github_invite.function.ts";
+import "std/dotenv/load.ts";
 
 const ChallengeInviteWorkflow = DefineWorkflow({
   callback_id: "challenge_invite_workflow",
@@ -21,11 +22,17 @@ const ChallengeInviteWorkflow = DefineWorkflow({
   },
 });
 
+const challengeRepo = `${Deno.env.get("CHALLENGE_ORG")}/${
+  Deno.env.get("TEMPLATE_REPO")
+}`;
+const challengeRepoUrl =
+  `<https://github.com/${challengeRepo}|${challengeRepo}>`;
+
 const inputForm = ChallengeInviteWorkflow.addStep(
   Schema.slack.functions.OpenForm,
   {
-    title: "Invite a candidate",
-    description: "TODO", // TODO
+    title: "Coding challenge invite",
+    description: `Invite someone to the ${challengeRepoUrl} repository.`,
     interactivity: ChallengeInviteWorkflow.inputs.interactivity,
     submit_label: "Send",
     fields: {
