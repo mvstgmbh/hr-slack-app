@@ -1,1 +1,11 @@
-{}
+{
+  "apps": {
+    "T4U5CFB1Q": {
+      "app_id": "A069TQRSHLL",
+      "IsDev": false,
+      "team_domain": "joinmvst",
+      "team_id": "T4U5CFB1Q"
+    }
+  },
+  "default": "joinmvst"
+}
