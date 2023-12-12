@@ -1,7 +1,6 @@
-# Deno Starter Template
+# HR Slack App
 
-This is a scaffolded Deno template used to build out Slack apps using the Slack
-CLI.
+This is a Slack app that helps HR automate some of their tasks.
 
 **Guide Outline**:
 
