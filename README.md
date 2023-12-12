@@ -2,7 +2,8 @@
 
 This is a Slack app that helps HR automate some of their tasks.
 
-This was build as part of [2023 Hackweek](https://www.notion.so/mvst/Automating-repetitive-tasks-with-the-new-Slack-API-9b605ffb182f40028f721c2c03084b5d?pvs=4)
+This was build as part of
+[2023 Hackweek](https://www.notion.so/mvst/Automating-repetitive-tasks-with-the-new-Slack-API-9b605ffb182f40028f721c2c03084b5d?pvs=4)
 
 ## Outline
 
