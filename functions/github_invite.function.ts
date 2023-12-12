@@ -30,7 +30,7 @@ export default SlackFunction(
   GitHubInvite,
   async ({ inputs, env }) => {
     const username = inputs.candidateGhUsername.replaceAll("@", "");
-    const newRepoName = username + env.NEW_REPO_SUFFIX;
+    const newRepoName = username + "-" + env.NEW_REPO_SUFFIX;
 
     const apiURL = "api.github.com";
     const headers = {
