@@ -6,7 +6,7 @@ const linkTrigger: Trigger<typeof ChallengeInviteWorkflow.definition> = {
   type: TriggerTypes.Shortcut,
   name: "CodeChallengeInvite",
   description:
-    "Start the workflow to create a repo and invite the candidate to it",
+    "Start the workflow to create a repo and invite the candidate to it. This can only be triggered from a channel.",
   workflow: `#/workflows/${ChallengeInviteWorkflow.definition.callback_id}`,
   inputs: {
     interactivity: {
