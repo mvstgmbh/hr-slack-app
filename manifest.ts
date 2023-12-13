@@ -8,4 +8,10 @@ export default Manifest({
   workflows: [ChallengeInviteWorkflow],
   outgoingDomains: ["api.github.com"],
   botScopes: ["commands", "chat:write"],
+  features: {
+    appHome: {
+      messagesTabEnabled: false,
+      messagesTabReadOnlyEnabled: false,
+    },
+  },
 });
