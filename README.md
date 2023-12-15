@@ -23,28 +23,11 @@ This was build as part of
 
 ## Setup
 
-Before getting started, first make sure you have a development workspace where
-you have permission to install apps. **Please note that the features in this
-project require that the workspace be part of
-[a Slack paid plan](https://slack.com/pricing).**
-
 ### Install the Slack CLI
 
 To use this template, you need to install and configure the Slack CLI.
 Step-by-step instructions can be found in our
 [Quickstart Guide](https://api.slack.com/automation/quickstart).
-
-### Clone the Template
-
-Start by cloning this repository:
-
-```zsh
-# Clone this project onto your machine
-$ slack create my-app -t slack-samples/deno-starter-template
-
-# Change into the project directory
-$ cd my-app
-```
 
 ## Running Your Project Locally
 
@@ -104,6 +87,11 @@ To manually create a trigger, use the following command:
 
 ```zsh
 $ slack trigger create --trigger-def triggers/sample_trigger.ts
+```
+
+### Restrict access to triggers
+Use ```zsh
+slack trigger access --trigger-id Ft06A40Q7Y1X --grant --channels G01EA8VUK18
 ```
 
 ## Datastores
