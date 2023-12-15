@@ -4,7 +4,7 @@ import ChallengeInviteWorkflow from "../workflows/ChallengeInvite.workflow.ts";
 
 const linkTrigger: Trigger<typeof ChallengeInviteWorkflow.definition> = {
   type: TriggerTypes.Shortcut,
-  name: "CodeChallengeInvite",
+  name: "Invite to Code Challenge",
   description:
     "Start the workflow to create a repo and invite the candidate to it. This can only be triggered from a channel.",
   workflow: `#/workflows/${ChallengeInviteWorkflow.definition.callback_id}`,
