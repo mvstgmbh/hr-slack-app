@@ -31,7 +31,7 @@ const challengeRepoUrl =
 const inputForm = ChallengeInviteWorkflow.addStep(
   Schema.slack.functions.OpenForm,
   {
-    title: "Coding challenge invite",
+    title: "Invite to Code Challenge",
     description: `Invite someone to the ${challengeRepoUrl} repository.`,
     interactivity: ChallengeInviteWorkflow.inputs.interactivity,
     submit_label: "Send",
